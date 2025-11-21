@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | MySchool Management System</title>
+  <link rel="stylesheet" href="/css/contact.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo"><i class="fa-solid fa-graduation-cap"></i> SMS</div>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact" class="active">Contact</a></li>
+        <li><a class="login-btn" href="/login"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Contact Section -->
+  <section class="contact">
+    <div class="container">
+      <h1>Contact Us</h1>
+      <p>We’d love to hear from you! Whether you have a question, feedback, or partnership inquiry, reach out below.</p>
+
+      <div class="contact-grid">
+        <!-- Contact Info -->
+        <div class="contact-info">
+          <h3><i class="fa-solid fa-location-dot"></i> Address</h3>
+          <p>123 MySchool Avenue, Education City, Knowledge Town</p>
+
+          <h3><i class="fa-solid fa-phone"></i> Phone</h3>
+          <p>+92 300 1234567</p>
+
+          <h3><i class="fa-solid fa-envelope"></i> Email</h3>
+          <p>info@myschool.edu</p>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form">
+          <form action="/contact" method="POST">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            <button type="submit" class="cta-btn">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> MySchool Management System. For educational purposes.</p>
+  </footer>
+</body>
+</html>

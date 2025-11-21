@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Page Not Found - MySchool Theme</title>
+    <!-- Load Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import (Inter is clean and professional) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Use a dark blue similar to the header section of your theme */
+            background-color: #0A3266; 
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-8">
+    <!-- Main Error Container -->
+    <div class="max-w-xl w-full mx-auto text-center bg-white shadow-2xl rounded-xl p-8 sm:p-12 lg:p-16">
+        
+        <!-- Large Error Code -->
+        <h1 class="text-7xl sm:text-9xl font-extrabold text-[#0A3266] mb-4">
+            404
+        </h1>
+
+        <!-- Error Title -->
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
+            Page Not Found
+        </h2>
+
+        <!-- Friendly Message -->
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+            Oops! It seems the page you were looking for doesn't exist or has been moved. Don't worry, we'll help you get back on track.
+        </p>
+
+        <!-- Call to Action Button (The signature blue button) -->
+        <a href="/" 
+           class="inline-flex items-center justify-center px-8 py-3 
+                  text-lg font-semibold tracking-wider text-white 
+                  bg-[#007BFF] hover:bg-[#0056b3] transition-all duration-300 
+                  rounded-full shadow-lg hover:shadow-xl transform hover:scale-[1.02] 
+                  focus:outline-none focus:ring-4 focus:ring-[#007BFF]/50">
+            Go to Homepage
+        </a>
+
+        <!-- Small Support Link -->
+        <div class="mt-8 text-sm text-gray-500">
+            If you believe this is an error, please contact <a href="mailto:support@myschool.com" class="text-[#0A3266] hover:text-[#007BFF] font-medium">Support</a>.
+        </div>
+    </div>
+</body>
+</html>

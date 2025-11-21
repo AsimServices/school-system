@@ -1,0 +1,383 @@
+<!-- Chosen Palette: Dark Blue (#141E30) and Light Gray/White for contrast, with Green (#2ecc71) for Present and Red (#e74c3c) for Absent. -->
+<!-- Application Structure Plan: The architecture uses a fixed, dark-blue sidebar for navigation mirroring the source image, and a main content area with a light background. The main area is structured into three clear horizontal sections: 1. Key Metrics (Cards) for immediate status, 2. A Control Panel for filtering by Class and Date Range (interactive element), and 3. Visualizations (Chart.js) and a Details Table for weekly trends and individual records. This structure is chosen to support quick status checks and deeper data exploration. -->
+<!-- Visualization & Content Choices: 
+  1. Key Metrics (Cards): Report Info -> Daily Status -> Simple Text Display -> No Interaction (Clickable for drill-down conceptually) -> HTML/JS. Justification: Provides immediate, critical information.
+  2. Weekly Trend Chart: Report Info -> Performance/Trend Analysis -> Bar Chart (Present vs. Absent by Day) -> Date Range Selection (Dropdown) -> Chart.js. Justification: Visualizes temporal change and comparison clearly.
+  3. Student Detail Table: Report Info -> Individual Records -> Sortable/Filterable Table -> Class Filter (Dropdown) and Status Toggle -> HTML/JS. Justification: Allows drilling down to specific students.
+  4. Class/Date Filter: Report Info -> Context/Scope Control -> Dropdown Selectors -> User Input/Filter Logic -> HTML/JS. Justification: Essential for data exploration.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-color: #141E30; /* Dark Blue */
+            --accent-color: #2a5298; /* School Portal Blue */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7ff;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Custom styles for the Dashboard layout and responsiveness */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background-color: var(--sidebar-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 50;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+        }
+        #main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            background-color: #f7f7f7;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 1024px) {
+            #sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            #main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            #toggle-btn {
+                display: block !important;
+            }
+        }
+
+        /* Chart container wrapper for responsiveness */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 40vh; /* Base height */
+            max-height: 450px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 50vh; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="text-white p-4 flex flex-col shadow-2xl">
+        <div class="text-2xl font-bold py-4 mb-4" style="color: white; background-color: var(--accent-color); padding: 10px; border-radius: 8px;">School Portal</div>
+            <nav class="flex-grow">
+            <!-- Home is Active -->
+            <a href="/dashboard" class="flex items-center p-3 rounded-lg mb-2 bg-slate-700 font-semibold shadow-inner">
+                <span class="w-6 h-6 mr-3"></span> Home
+            </a>
+            <a href="/classes" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Classes
+            </a>
+            <a href="/attendance" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Attendance
+            </a>
+            <a href="/exams" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Exams
+            </a>
+            <a href="/events" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Events
+            </a>
+            <a href="/dashboard" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Notifications
+            </a>
+        </nav>
+        <a href="/views/main-page" class="flex items-center p-3 rounded-lg mb-2 bg-red-600 hover:bg-red-700 transition">
+            <span class="w-6 h-6 mr-3"></span> Logout
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="p-6 lg:p-10 transition-all">
+        <!-- Mobile Toggle Button -->
+        <button id="toggle-btn" class="lg:hidden fixed top-4 left-4 p-2 bg-gray-800 text-white rounded-md z-50 shadow-lg" style="display: none;">
+            ☰
+        </button>
+        
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Attendance Dashboard</h1>
+            <p class="text-gray-500 mt-1">Real-time attendance summary and historical trends across all registered courses.</p>
+        </header>
+
+        <!-- Section 1: Key Metrics Cards -->
+        <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <!-- Card 1: Total Students (using blue accent from screenshot) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4" style="border-color: var(--accent-color);">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Total Students</h2>
+                <p id="totalStudents" class="text-4xl font-extrabold text-gray-800">--</p>
+                <p class="text-sm text-gray-400 mt-2">Currently registered in all classes.</p>
+            </div>
+            
+            <!-- Card 2: Present Today (using green accent) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Present Today</h2>
+                <p id="presentToday" class="text-4xl font-extrabold text-green-600">--</p>
+                <p class="text-sm text-gray-400 mt-2">Students marked present as of now.</p>
+            </div>
+
+            <!-- Card 3: Absent Today (using red accent) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Absent Today</h2>
+                <p id="absentToday" class="text-4xl font-extrabold text-red-600">--</p>
+                <p class="text-sm text-gray-400 mt-2">Students marked absent or pending.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Control Panel and Visualization -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-10">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Attendance Trend Analysis</h3>
+            
+            <!-- Filter Controls (Interactive Element) -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1">
+                    <label for="class-select" class="block text-sm font-medium text-gray-700 mb-1">Select Class:</label>
+                    <select id="class-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All Classes</option>
+                        <option value="math">Mathematics 101</option>
+                        <option value="science">Science 101</option>
+                        <option value="history">World History</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label for="date-range-select" class="block text-sm font-medium text-gray-700 mb-1">Date Range:</label>
+                    <select id="date-range-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 30 Days</option>
+                        <option value="year">Last 1 Year</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Attendance Chart -->
+            <div class="chart-container border border-gray-100 rounded-lg p-4">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">This bar chart shows the total number of students present versus absent over the selected time range, allowing for easy identification of weekly or monthly trends.</p>
+        </div>
+
+        <!-- Section 3: Detailed Student Status Table -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Detailed Student Status (Math 101)</h3>
+            
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Attendance %</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Today</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-detail-table" class="bg-white divide-y divide-gray-200">
+                        <!-- Data populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">Individual student records provide specific attendance percentages and daily status updates. This data changes based on the 'Select Class' filter above.</p>
+        </div>
+
+    </div>
+
+    <script>
+        let myAttendanceChart;
+        const SIDEBAR_WIDTH = '280px';
+
+        // --- Simulated Data for the Dashboard ---
+        const dashboardData = {
+            totalStudents: 500,
+            presentToday: 485,
+            absentToday: 15,
+            classData: {
+                all: {
+                    days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                    present: [490, 485, 492, 475, 488],
+                    absent: [10, 15, 8, 25, 12],
+                    studentDetails: [
+                        { roll: 1001, name: 'Alice Johnson', percentage: '98%', status: 'Present' },
+                        { roll: 1002, name: 'Bob Smith', percentage: '75%', status: 'Absent' },
+                        { roll: 1003, name: 'Charlie Brown', percentage: '92%', status: 'Present' },
+                        { roll: 1004, name: 'Dana Scully', percentage: '88%', status: 'Present' },
+                        { roll: 1005, name: 'Eric Foreman', percentage: '99%', status: 'Present' },
+                    ]
+                },
+                math: {
+                    days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                    present: [45, 47, 43, 49, 46],
+                    absent: [5, 3, 7, 1, 4],
+                    studentDetails: [
+                        { roll: 201, name: 'John Doe', percentage: '95%', status: 'Present' },
+                        { roll: 202, name: 'Jane Williams', percentage: '85%', status: 'Absent' },
+                        { roll: 203, name: 'Peter Jones', percentage: '99%', status: 'Present' },
+                    ]
+                },
+                // More classes can be added here
+            }
+        };
+
+        // --- Core Functions ---
+
+        function updateCards(data) {
+            document.getElementById('totalStudents').textContent = data.totalStudents;
+            document.getElementById('presentToday').textContent = data.presentToday;
+            document.getElementById('absentToday').textContent = data.absentToday;
+        }
+
+        function createChart(chartData) {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+            // Destroy existing chart instance if it exists
+            if (myAttendanceChart) {
+                myAttendanceChart.destroy();
+            }
+
+            myAttendanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.days,
+                    datasets: [
+                        {
+                            label: 'Present Students',
+                            data: chartData.present,
+                            backgroundColor: '#2ecc71', // Green
+                            borderColor: '#27ae60',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Absent Students',
+                            data: chartData.absent,
+                            backgroundColor: '#e74c3c', // Red
+                            borderColor: '#c0392b',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL: allows chart to fill the container size
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } },
+                        title: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Number of Students' } 
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDetailTable(students) {
+            const tableBody = document.getElementById('student-detail-table');
+            tableBody.innerHTML = ''; // Clear previous data
+
+            students.forEach(student => {
+                const row = tableBody.insertRow();
+                row.className = 'hover:bg-gray-50 transition-colors';
+                
+                const statusColor = student.status === 'Present' ? 'text-green-600 font-semibold bg-green-50 rounded-full py-1 px-3 text-center inline-block text-xs' : 'text-red-600 font-semibold bg-red-50 rounded-full py-1 px-3 text-center inline-block text-xs';
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.roll}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${student.percentage}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="${statusColor}">${student.status}</span>
+                    </td>
+                `;
+            });
+            // Update table title to reflect the selected class
+            const selectedClassText = document.getElementById('class-select').options[document.getElementById('class-select').selectedIndex].text;
+            document.querySelector('.bg-white.p-6.rounded-xl.shadow-lg h3').textContent = `Detailed Student Status (${selectedClassText})`;
+        }
+
+
+        function handleFilterChange() {
+            const selectedClass = document.getElementById('class-select').value;
+            const currentClassData = dashboardData.classData[selectedClass];
+            
+            // For simplicity, date range only triggers chart refresh but uses same weekly data structure
+            const selectedRange = document.getElementById('date-range-select').value; 
+
+            createChart(currentClassData);
+            updateDetailTable(currentClassData.studentDetails);
+        }
+
+        // --- Event Listeners and Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Initial Load: Use 'all' classes data
+            const initialData = dashboardData.classData['all'];
+            updateCards(dashboardData);
+            createChart(initialData);
+            updateDetailTable(initialData.studentDetails);
+
+            // 2. Attach Filter Change Listener
+            document.getElementById('class-select').addEventListener('change', handleFilterChange);
+            document.getElementById('date-range-select').addEventListener('change', handleFilterChange);
+            
+            // 3. Mobile Sidebar Toggle Logic
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const toggleBtn = document.getElementById('toggle-btn');
+            
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                if (sidebar.classList.contains('open')) {
+                    mainContent.style.filter = 'blur(2px)';
+                } else {
+                    mainContent.style.filter = 'none';
+                }
+            });
+
+            // Close sidebar when clicking outside (on mobile)
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 1024 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    mainContent.style.filter = 'none';
+                }
+            });
+
+            // Prevent scroll on mobile when sidebar is open
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 1024) {
+                    sidebar.classList.remove('open');
+                    mainContent.style.filter = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

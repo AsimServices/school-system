@@ -1,0 +1,135 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1f2937;
+  padding: 15px 40px;
+}
+.navbar .logo {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: bold;
+}
+.navbar .logo i {
+  margin-right: 8px;
+  color: #3b82f6;
+}
+.navbar ul {
+  list-style: none;
+  display: flex;
+}
+.navbar ul li {
+  margin-left: 20px;
+}
+.navbar ul li a {
+  color: #f9fafb;
+  text-decoration: none;
+  padding: 8px 14px;
+  transition: 0.3s;
+  font-weight: 500;
+}
+.navbar ul li a:hover,
+.navbar ul li a.active {
+  background: #395294;
+  border-radius: 6px;
+}
+.login-btn {
+  background: #6c8add;
+  border-radius: 6px;
+  font-weight: bold;
+}
+.login-btn:hover {
+  background: #2563eb;
+}
+
+/* Contact Section */
+.contact {
+  padding: 80px 20px;
+  background: #f9fafb;
+  text-align: center;
+}
+.contact h1 {
+  font-size: 36px;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+.contact p {
+  font-size: 18px;
+  color: #374151;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* Contact Grid */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px;
+  align-items: start;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Contact Info */
+.contact-info h3 {
+  color: #1f2937;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.contact-info p {
+  color: #374151;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+/* Contact Form */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 16px;
+  outline: none;
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+}
+.contact-form button {
+  background: #1ec3ec;
+  color: #fff;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.contact-form button:hover {
+  background: #059cc2;
+}
+
+/* Footer */
+footer {
+  background: #d1d1d1;
+  color: #000000;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}

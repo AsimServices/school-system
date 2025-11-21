@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Load Tailwind CSS for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles from styles.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px; /* Add padding for small screens */
+        }
+        
+        .container {
+            display: flex;
+            background: #ffffff1a;
+            border-radius: 15px;
+            overflow: hidden;
+            width: 850px;
+            max-width: 95%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 100%;
+                max-width: 100%;
+            }
+            .welcome {
+                order: 2; /* Put welcome section below form on mobile */
+            }
+            .form {
+                order: 1;
+            }
+        }
+        
+        .welcome {
+            flex: 1;
+            text-align: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .welcome h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .welcome img {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto; /* Centered on small screens */
+        }
+        
+        .form {
+            flex: 1;
+            background: white;
+            color: black;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2a5298;
+        }
+        
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.2);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .submit {
+            background: #2a5298;
+            color: white;
+            box-shadow: 0 4px 10px rgba(42, 82, 152, 0.3);
+        }
+
+        .submit:hover {
+            background: #1e3c72;
+        }
+        
+        .close {
+            background: #e0e0e0;
+            color: #444;
+        }
+
+        .close:hover {
+            background: #ccc;
+        }
+        
+        a {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #e53e3e; /* Use a strong red for errors */
+            font-size: 12px;
+            min-height: 18px; /* Maintain space even if empty */
+            margin-top: 2px;
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #e53e3e;
+        }
+
+        .form > p:last-of-type {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome">
+            <h1>Create Account</h1>
+            <!-- Placeholder for the user icon -->
+            <img src="https://placehold.co/100x100/1e3c72/ffffff?text=User" 
+                 onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';" 
+                 alt="user icon">
+            <p class="developer">School Management System</p>
+        </div>
+
+        <div class="form">
+            <h2>Register</h2>
+            <form action="/register" method="POST">
+                <label>Full Name</label>
+                <!-- Rendered as empty string on initial load -->
+                <input type="text" name="name" value="" required>
+                <!-- Rendered as empty paragraph on initial load -->
+                <p class="error"></p>
+
+                <label>Email</label>
+                <input type="email" name="email" value="" required>
+                <p class="error"></p>
+
+                <label>Password</label>
+                <input type="password" name="password" required>
+                <p class="error"></p>
+
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" required>
+                <p class="error"></p>
+
+                <label>User Type</label>
+                <select name="userType" required>
+                    <!-- No option selected on initial load, browser defaults to the first -->
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <div class="buttons">
+                    <button type="submit" class="submit">REGISTER</button>
+                    <button type="button" class="close" onclick="window.location.href='/'">CANCEL</button>
+                </div>
+            </form>
+
+            <p class="msg"></p>
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>

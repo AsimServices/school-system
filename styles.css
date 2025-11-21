@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+}
+
+.container {
+  display: flex;
+  background: #ffffff1a;
+  border-radius: 15px;
+  overflow: hidden;
+  width: 850px;
+  max-width: 95%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.welcome {
+  flex: 1;
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.welcome h1 {
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.welcome img {
+  width: 100px;
+  margin: 20px 0;
+}
+
+.form {
+  flex: 1;
+  background: white;
+  color: black;
+  padding: 40px;
+}
+
+.form h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #2a5298;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit {
+  background: #2a5298;
+  color: white;
+}
+
+.close {
+  background: #ccc;
+}
+
+a {
+  color: #2a5298;
+  text-decoration: none;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+}

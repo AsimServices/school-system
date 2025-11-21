@@ -1,0 +1,368 @@
+<!-- This single file contains the Exams Dashboard layout, maintaining the design aesthetic of the School Portal. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exams Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js for the performance visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Lucide Icons for vector-based icons -->
+    <script type="module">
+        // Updated import list to include all required sidebar icons (Home, ClipboardCheck, Bell, LogOut)
+        import { createIcons, Calendar, BookOpen, TrendingUp, Clock, FileText, Home, ClipboardCheck, Bell, LogOut } from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest';
+        createIcons({ icons: { Calendar, BookOpen, TrendingUp, Clock, FileText, Home, ClipboardCheck, Bell, LogOut } });
+    </script>
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-color: #141E30; /* Dark Blue */
+            --accent-color: #2a5298; /* School Portal Blue */
+            --exam-color: #ffc107; /* Yellow/Orange for Exams */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Dashboard Container Layout */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background-color: var(--sidebar-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 50;
+        }
+        #main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            transition: margin-left 0.3s ease-in-out;
+        }
+        @media (max-width: 1024px) {
+            #sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            #main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        .card-icon { width: 1.5rem; height: 1.5rem; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 35vh; 
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar (Navigation) - Emojis replaced with Lucide Icons -->
+    <div id="sidebar" class="text-white p-4 flex flex-col shadow-2xl">
+        <div class="text-2xl font-bold py-4 mb-4" style="color: white; background-color: var(--accent-color); padding: 10px; border-radius: 8px;">School Portal</div>
+        <nav class="flex-grow">
+            <!-- Home is Active -->
+            <a href="/dashboard" class="flex items-center p-3 rounded-lg mb-2 bg-slate-700 font-semibold shadow-inner">
+                <span class="w-6 h-6 mr-3"></span> Home
+            </a>
+            <a href="/classes" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Classes
+            </a>
+            <a href="/attendance" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Attendance
+            </a>
+            <a href="/exams" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Exams
+            </a>
+            <a href="/events" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Events
+            </a>
+            <a href="/dashboard" class="flex items-center p-3 rounded-lg mb-2 hover:bg-slate-700/70 transition">
+                <span class="w-6 h-6 mr-3"></span> Notifications
+            </a>
+        </nav>
+        <a href="/main-page" class="flex items-center p-3 rounded-lg mb-2 bg-red-600 hover:bg-red-700 transition">
+            <span class="w-6 h-6 mr-3"></span> Logout
+        </a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content" class="flex-1 p-6 lg:p-10">
+        
+        <header class="flex justify-between items-center pb-6 border-b border-gray-200 mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Exams and Performance</h1>
+            <button class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center">
+                <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> Schedule New Exam
+            </button>
+        </header>
+
+        <!-- Section 1: Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            
+            <!-- Card 1: Average Score -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-500 mb-2">Average Score (Last 5)</h2>
+                        <p id="avgScore" class="text-4xl font-extrabold text-green-600">84%</p>
+                    </div>
+                    <i data-lucide="trending-up" class="card-icon text-green-500 bg-green-100 p-2 rounded-full"></i>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Overall student performance metric.</p>
+            </div>
+            
+            <!-- Card 2: Upcoming Exams -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4" style="border-color: var(--exam-color);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-500 mb-2">Upcoming Exams</h2>
+                        <p id="upcomingExams" class="text-4xl font-extrabold" style="color: var(--exam-color);">3</p>
+                    </div>
+                    <i data-lucide="calendar" class="card-icon" style="color: var(--exam-color); background-color: #fff3c9;" ></i>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Exams scheduled in the next 14 days.</p>
+            </div>
+
+            <!-- Card 3: Pending Submissions -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-500 mb-2">Pending Submissions</h2>
+                        <p id="pendingSubs" class="text-4xl font-extrabold text-red-600">12</p>
+                    </div>
+                    <i data-lucide="clock" class="card-icon text-red-500 bg-red-100 p-2 rounded-full"></i>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Assessments due but not yet submitted.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Performance Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-10">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Recent Class Performance</h3>
+            
+            <div class="chart-container border border-gray-100 rounded-lg p-4">
+                <canvas id="performanceChart"></canvas>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">This chart tracks the average class score for the last five major exams.</p>
+        </div>
+
+        <!-- Section 3: Detailed Exam Schedule and Results Table -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Exam Schedule & Results</h3>
+            
+            <!-- Filters -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1">
+                    <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Status:</label>
+                    <select id="status-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label for="course-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Course:</label>
+                    <select id="course-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All Courses</option>
+                        <option value="math">Mathematics 101</option>
+                        <option value="science">Science 101</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Exam Table -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exam Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class Avg Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exam-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Data populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <script>
+        let myPerformanceChart;
+
+        // --- Simulated Data for the Dashboard ---
+        const examData = {
+            avgScore: '84%',
+            upcomingExams: 3,
+            pendingSubs: 12,
+            chartData: {
+                labels: ['Q3 Math Test', 'History Essay', 'Q3 Science Test', 'English Midterm', 'Physics Final'],
+                scores: [78, 92, 80, 88, 84], // Class Average Scores
+            },
+            exams: [
+                { name: 'Physics Final', course: 'Physics 201', dateTime: '2025-05-10, 10:00 AM', status: 'Completed', score: '84%', type: 'science' },
+                { name: 'English Midterm', course: 'English Literature', dateTime: '2025-05-20, 09:00 AM', status: 'Completed', score: '88%', type: 'other' },
+                { name: 'Algebra Quiz 2', course: 'Mathematics 101', dateTime: '2025-06-05, 11:00 AM', status: 'Upcoming', score: 'N/A', type: 'math' },
+                { name: 'History Research Paper', course: 'World History', dateTime: '2025-06-15, 05:00 PM', status: 'Upcoming', score: 'N/A', type: 'other' },
+                { name: 'Chemistry Practical', course: 'Science 101', dateTime: '2025-07-01, 01:00 PM', status: 'Upcoming', score: 'N/A', type: 'science' },
+            ]
+        };
+
+        // --- Core Functions ---
+
+        function updateKeyMetrics(data) {
+            document.getElementById('avgScore').textContent = data.avgScore;
+            document.getElementById('upcomingExams').textContent = data.upcomingExams;
+            document.getElementById('pendingSubs').textContent = data.pendingSubs;
+        }
+
+        function createPerformanceChart(chartData) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+
+            if (myPerformanceChart) {
+                myPerformanceChart.destroy();
+            }
+
+            myPerformanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Class Average Score (%)',
+                            data: chartData.scores,
+                            backgroundColor: 'rgba(255, 193, 7, 0.8)', // Orange/Yellow
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            title: { display: true, text: 'Score Percentage' } 
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderExamTable(exams, statusFilter, courseFilter) {
+            const tableBody = document.getElementById('exam-table-body');
+            tableBody.innerHTML = ''; // Clear previous data
+
+            const filteredExams = exams.filter(exam => {
+                const statusMatch = statusFilter === 'all' || 
+                                    (statusFilter === 'upcoming' && exam.status === 'Upcoming') ||
+                                    (statusFilter === 'completed' && exam.status === 'Completed');
+                
+                const courseMatch = courseFilter === 'all' || exam.type === courseFilter;
+                
+                return statusMatch && courseMatch;
+            });
+
+
+            filteredExams.forEach(exam => {
+                const row = tableBody.insertRow();
+                row.className = 'hover:bg-gray-50 transition-colors';
+                
+                let statusClass = '';
+                if (exam.status === 'Upcoming') {
+                    statusClass = 'text-blue-600 bg-blue-50';
+                } else if (exam.status === 'Completed') {
+                    statusClass = 'text-green-600 bg-green-50';
+                }
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${exam.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${exam.course}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${exam.dateTime}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="inline-block py-1 px-3 rounded-full font-semibold text-xs ${statusClass}">${exam.status}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-center text-gray-800">${exam.score}</td>
+                `;
+            });
+
+            if (filteredExams.length === 0) {
+                 tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500">No exams match the current filters.</td></tr>`;
+            }
+        }
+
+        function handleFilterChange() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const courseFilter = document.getElementById('course-filter').value;
+            renderExamTable(examData.exams, statusFilter, courseFilter);
+        }
+
+        // --- Event Listeners and Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Initial Load
+            updateKeyMetrics(examData);
+            createPerformanceChart(examData.chartData);
+            renderExamTable(examData.exams, 'all', 'all');
+
+            // 2. Attach Filter Change Listeners
+            document.getElementById('status-filter').addEventListener('change', handleFilterChange);
+            document.getElementById('course-filter').addEventListener('change', handleFilterChange);
+            
+            // 3. Mobile Sidebar Toggle Logic (copied from previous dashboards)
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '☰';
+            toggleBtn.className = 'lg:hidden fixed top-4 left-4 p-2 bg-gray-800 text-white rounded-md z-50 shadow-lg';
+            document.body.appendChild(toggleBtn);
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                mainContent.style.filter = sidebar.classList.contains('open') ? 'blur(2px)' : 'none';
+            });
+            
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 1024 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    mainContent.style.filter = 'none';
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 1024) {
+                    sidebar.classList.remove('open');
+                    mainContent.style.filter = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

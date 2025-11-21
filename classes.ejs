@@ -1,0 +1,19 @@
+app.get("/classes", (req, res) => {
+  const { grade, section } = req.query;
+
+  // Mock data for example
+  const allTimetables = {
+    "6A": [
+      { day: "Monday", period1: "Math", period2: "English", period3: "Science", period4: "History", period5: "PE" },
+      { day: "Tuesday", period1: "Urdu", period2: "Math", period3: "Art", period4: "Islamiyat", period5: "Computers" },
+    ],
+    "9B": [
+      { day: "Monday", period1: "Physics", period2: "Math", period3: "Chemistry", period4: "English", period5: "Bio" },
+      { day: "Tuesday", period1: "Urdu", period2: "Math", period3: "Lab", period4: "Islamiyat", period5: "Free" },
+    ]
+  };
+
+  const timetable = allTimetables[`${grade}${section}`] || [];
+
+  res.render("classes", { grade, section, timetable });
+});
